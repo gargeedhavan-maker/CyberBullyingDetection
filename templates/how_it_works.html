@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>How It Works - Cyber Bullying Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/">HOME</a>
+        <span class="separator">|</span>
+        <a href="/feed">FEED</a>
+        <span class="separator">|</span>
+        <a href="/how-it-works" class="active">HOW IT WORKS</a>
+        <span class="separator">|</span>
+        <a href="/history">HISTORY</a>
+        <span class="separator">|</span>
+        <a href="/awareness">AWARENESS</a>
+        <span class="separator">|</span>
+        <a href="/examples">EXAMPLES</a>
+        <span class="separator">|</span>
+        <a href="/performance">PERFORMANCE</a>
+    </nav>
+
+    <div class="card">
+        <h1>HOW IT WORKS</h1>
+        <p class="subtitle">Natural Language Processing Pipeline</p>
+
+        <div class="pipeline-flow">
+            <div class="pipeline-step">Social Media Comment</div>
+            <div class="pipeline-arrow">↓</div>
+            <div class="pipeline-step">Text Preprocessing</div>
+            <div class="pipeline-arrow">↓</div>
+            <div class="pipeline-step">TF-IDF Vectorization</div>
+            <div class="pipeline-arrow">↓</div>
+            <div class="pipeline-step">Logistic Regression</div>
+            <div class="pipeline-arrow">↓</div>
+            <div class="pipeline-step">Prediction</div>
+        </div>
+
+        <div class="info-block">
+            <h3>Text Preprocessing:</h3>
+            <p>Cleans the entered text before classification by converting to lowercase, removing punctuation, and trimming spaces.</p>
+        </div>
+
+        <div class="info-block">
+            <h3>TF-IDF:</h3>
+            <p>Converts text into numerical features by calculating term frequency and inverse document frequency across the vocabulary.</p>
+        </div>
+
+        <div class="info-block">
+            <h3>Logistic Regression:</h3>
+            <p>Classifies the comment into bullying or not bullying using a linear decision boundary with the Sigmoid probability function.</p>
+        </div>
+
+        <div class="info-block">
+            <h3>Prediction:</h3>
+            <p>Displays the final classification (Cyber Bullying or Not Cyber Bullying) and confidence percentage to the user.</p>
+        </div>
+    </div>
+</body>
+</html>

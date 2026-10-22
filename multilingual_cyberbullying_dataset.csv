@@ -1,0 +1,19 @@
+text,language,label,category
+"Beautiful picture!",English,safe,compliment
+"Thank you for sharing",English,safe,normal
+"I disagree with your opinion",English,safe,disagreement
+"Please consult another doctor",English,safe,advice
+"You are useless and nobody likes you",English,bullying,insult
+"Shut up idiot",English,bullying,insult
+"तुम बहुत अच्छे हो",Hindi,safe,compliment
+"आपकी फोटो बहुत अच्छी है",Hindi,safe,compliment
+"तुम किसी काम के नहीं हो",Hindi,bullying,insult
+"तुम बेवकूफ हो",Hindi,bullying,insult
+"तुझा फोटो खूप छान आहे",Marathi,safe,compliment
+"मला तुझं मत मान्य नाही",Marathi,safe,disagreement
+"तू काहीच कामाचा नाहीस",Marathi,bullying,insult
+"तू खूप मूर्ख आहेस",Marathi,bullying,insult
+"Tum bahut achhe ho",Romanized Hindi,safe,compliment
+"Tum kisi kaam ke nahi ho",Romanized Hindi,bullying,insult
+"Tujha photo khup chhan aahe",Romanized Marathi,safe,compliment
+"Tu kahich kaamacha nahis",Romanized Marathi,bullying,insult

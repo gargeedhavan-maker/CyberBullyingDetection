@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detection History - Cyber Bullying Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/">HOME</a>
+        <span class="separator">|</span>
+        <a href="/feed">FEED</a>
+        <span class="separator">|</span>
+        <a href="/how-it-works">HOW IT WORKS</a>
+        <span class="separator">|</span>
+        <a href="/history" class="active">HISTORY</a>
+        <span class="separator">|</span>
+        <a href="/awareness">AWARENESS</a>
+        <span class="separator">|</span>
+        <a href="/examples">EXAMPLES</a>
+        <span class="separator">|</span>
+        <a href="/performance">PERFORMANCE</a>
+    </nav>
+
+    <div class="card">
+        <h1>DETECTION HISTORY</h1>
+        <p class="subtitle">Locally Stored Comment Analyses</p>
+
+        <div class="table-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Comment</th>
+                        <th>Prediction</th>
+                        <th>Confidence</th>
+                    </tr>
+                </thead>
+                <tbody id="history-body">
+                    <!-- Populated via localStorage script below -->
+                </tbody>
+            </table>
+        </div>
+
+        <button type="button" id="clear-btn" class="btn">CLEAR HISTORY</button>
+    </div>
+
+    <script>
+        function loadHistory() {
+            const tbody = document.getElementById("history-body");
+            const history = JSON.parse(localStorage.getItem("detection_history") || "[]");
+
+            if (history.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="3" class="empty-msg">No comments analyzed yet. Go to Home to check a comment.</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = history.map(item => `
+                <tr>
+                    <td>"${item.comment}"</td>
+                    <td>${item.prediction}</td>
+                    <td>${item.confidence}</td>
+                </tr>
+            `).join('');
+        }
+
+        document.getElementById("clear-btn").addEventListener("click", function() {
+            localStorage.removeItem("detection_history");
+            loadHistory();
+        });
+
+        loadHistory();
+    </script>
+</body>
+</html>

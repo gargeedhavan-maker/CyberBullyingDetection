@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Model Performance - Cyber Bullying Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/">HOME</a>
+        <span class="separator">|</span>
+        <a href="/feed">FEED</a>
+        <span class="separator">|</span>
+        <a href="/how-it-works">HOW IT WORKS</a>
+        <span class="separator">|</span>
+        <a href="/history">HISTORY</a>
+        <span class="separator">|</span>
+        <a href="/awareness">AWARENESS</a>
+        <span class="separator">|</span>
+        <a href="/examples">EXAMPLES</a>
+        <span class="separator">|</span>
+        <a href="/performance" class="active">PERFORMANCE</a>
+    </nav>
+
+    <div class="card">
+        <h1>MODEL PERFORMANCE</h1>
+        <p class="subtitle">Evaluated on Unseen Test Dataset (20% Split)</p>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-label">Accuracy</div>
+                <div class="metric-value">{{ metrics.accuracy }}%</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Precision</div>
+                <div class="metric-value">{{ metrics.precision }}%</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">Recall</div>
+                <div class="metric-value">{{ metrics.recall }}%</div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-label">F1 Score</div>
+                <div class="metric-value">{{ metrics.f1_score }}%</div>
+            </div>
+        </div>
+
+        <div class="info-block">
+            <h3>Confusion Matrix:</h3>
+            <table class="matrix-table">
+                <thead>
+                    <tr>
+                        <th>Actual \ Predicted</th>
+                        <th>Not Bullying</th>
+                        <th>Bullying</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Not Bullying</strong></td>
+                        <td>{{ metrics.confusion_matrix.true_negative }} (TN)</td>
+                        <td>{{ metrics.confusion_matrix.false_positive }} (FP)</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Bullying</strong></td>
+                        <td>{{ metrics.confusion_matrix.false_negative }} (FN)</td>
+                        <td>{{ metrics.confusion_matrix.true_positive }} (TP)</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="info-block" style="margin-top: 14px;">
+            <p style="font-size: 12px; color: #777777;">
+                Dataset: {{ metrics.total_samples }} total comments • {{ metrics.train_samples }} training samples • {{ metrics.test_samples }} testing samples.
+                Calculated by <code>train_model.py</code> on holdout test data.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

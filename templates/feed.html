@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Social Media Feed - Cyber Bullying Detection System</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <nav>
+        <a href="/">HOME</a>
+        <span class="separator">|</span>
+        <a href="/feed" class="active">FEED</a>
+        <span class="separator">|</span>
+        <a href="/how-it-works">HOW IT WORKS</a>
+        <span class="separator">|</span>
+        <a href="/history">HISTORY</a>
+        <span class="separator">|</span>
+        <a href="/awareness">AWARENESS</a>
+        <span class="separator">|</span>
+        <a href="/examples">EXAMPLES</a>
+        <span class="separator">|</span>
+        <a href="/performance">PERFORMANCE</a>
+    </nav>
+
+    <div class="feed-container">
+        <!-- Feed Title Card -->
+        <div class="card" style="padding: 20px 24px; text-align: center;">
+            <h1 style="font-size: 18px; margin-bottom: 4px;">SOCIAL MEDIA FEED</h1>
+            <p class="subtitle" style="margin-bottom: 0;">Multilingual Comment Moderation (English • Hindi • Marathi)</p>
+        </div>
+
+        <!-- Sample Posts -->
+        {% for post in posts %}
+        <div class="feed-post" data-post-id="{{ post.id }}">
+            <!-- Post Header -->
+            <div class="post-header">
+                <div class="post-user">
+                    <div class="avatar-circle">{{ post.avatar }}</div>
+                    <div class="user-meta">
+                        <span class="username-text">@{{ post.username }}</span>
+                    </div>
+                </div>
+                <span class="post-time">{{ post.time }}</span>
+            </div>
+
+            <!-- Post Media -->
+            <div class="post-media-wrap">
+                <img src="{{ post.image }}" alt="Post image by @{{ post.username }}" class="post-media-img" loading="lazy">
+            </div>
+
+            <!-- Action Bar -->
+            <div class="post-actions-bar">
+                <button type="button" class="like-action-btn" id="like-btn-{{ post.id }}" onclick="handleToggleLike({{ post.id }})">
+                    <span class="like-heart-icon" id="like-icon-{{ post.id }}">{{ '♥' if 'demo_user' in post.liked_by else '♡' }}</span>
+                    <span class="like-count-text" id="like-count-{{ post.id }}">{{ post.likes }} likes</span>
+                </button>
+            </div>
+
+            <!-- Post Caption -->
+            <div class="post-caption-box">
+                <strong>@{{ post.username }}</strong>{{ post.caption }}
+            </div>
+
+            <!-- Comments Section -->
+            <div class="post-comments-section">
+                <div class="comments-header">
+                    <span>COMMENTS</span>
+                    <span id="comment-count-badge-{{ post.id }}" class="comment-count-badge">{{ post.comments|length }}</span>
+                </div>
+                
+                <div class="comments-list" id="comments-list-{{ post.id }}">
+                    {% if post.comments|length == 0 %}
+                    <div class="no-comments-msg">No comments yet. Be the first to comment.</div>
+                    {% else %}
+                    {% for c in post.comments %}
+                    <div class="comment-row">
+                        <span class="comment-author">@{{ c.username }}</span>
+                        <span class="comment-body">{{ c.text }}</span>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+                </div>
+
+                <!-- Comment Input Form -->
+                <form onsubmit="handleStartModeration(event, {{ post.id }})" class="add-comment-form">
+                    <input 
+                        type="text" 
+                        id="comment-input-{{ post.id }}" 
+                        placeholder="Write a comment in English, Hindi, or Marathi..." 
+                        class="add-comment-input" 
+                        autocomplete="off" 
+                        required>
+                    <button type="submit" class="btn add-comment-btn" id="comment-btn-{{ post.id }}">Post Comment</button>
+                </form>
+
+                <!-- Quick Test Multilingual Chips -->
+                <div style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px;">
+                    <button type="button" class="btn" style="padding: 4px 8px; font-size: 11px; background: #252525; color: #AAAAAA; border: 1px solid #3A3A3A;" onclick="quickFillComment({{ post.id }}, 'तुझा फोटो खूप छान आहे.')">Marathi Safe</button>
+                    <button type="button" class="btn" style="padding: 4px 8px; font-size: 11px; background: #252525; color: #AAAAAA; border: 1px solid #3A3A3A;" onclick="quickFillComment({{ post.id }}, 'तू काहीच कामाचा नाहीस.')">Marathi Bullying</button>
+                    <button type="button" class="btn" style="padding: 4px 8px; font-size: 11px; background: #252525; color: #AAAAAA; border: 1px solid #3A3A3A;" onclick="quickFillComment({{ post.id }}, 'तुम्हारी फोटो बहुत अच्छी है।')">Hindi Safe</button>
+                    <button type="button" class="btn" style="padding: 4px 8px; font-size: 11px; background: #252525; color: #AAAAAA; border: 1px solid #3A3A3A;" onclick="quickFillComment({{ post.id }}, 'तुम किसी काम के नहीं हो।')">Hindi Bullying</button>
+                    <button type="button" class="btn" style="padding: 4px 8px; font-size: 11px; background: #252525; color: #AAAAAA; border: 1px solid #3A3A3A;" onclick="quickFillComment({{ post.id }}, 'very bad picture')">English Harmful</button>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Polished Centered Comment Verification Modal -->
+    <div id="moderation-modal-overlay" class="modal-backdrop" style="display: none;">
+        <div class="modal-dialog" id="moderation-modal-dialog">
+            <!-- Neutral Status Pill Indicator -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                <div class="modal-status-badge" id="modal-status-pill">STATUS: VERIFIED</div>
+                <div id="modal-language-pill" style="font-size: 11px; color: #AAAAAA; background: #252525; border: 1px solid #3A3A3A; padding: 4px 8px; border-radius: 4px; text-transform: uppercase;">LANG: ENGLISH</div>
+            </div>
+
+            <!-- Heading -->
+            <h2 id="modal-title-text">COMMENT CHECK</h2>
+            
+            <!-- Short Explanation Message -->
+            <p id="modal-desc-text" class="modal-body-text">This comment doesn't appear to contain obvious bullying or abusive language.</p>
+            
+            <!-- Original Comment Preview Box -->
+            <div class="modal-comment-container">
+                <span class="modal-quote-label">YOUR COMMENT:</span>
+                <div id="modal-quote-content" class="modal-comment-quote"></div>
+            </div>
+
+            <!-- NLP Confidence Indicator -->
+            <div style="background: #161616; border: 1px solid #333333; border-radius: 6px; padding: 10px 12px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #AAAAAA; margin-bottom: 6px;">
+                    <span>NLP CONFIDENCE</span>
+                    <span id="modal-confidence-text" style="color: #FFFFFF; font-weight: bold;">95%</span>
+                </div>
+                <div style="height: 4px; background: #252525; border-radius: 2px; overflow: hidden;">
+                    <div id="modal-confidence-bar" style="height: 100%; width: 95%; background: #FFFFFF;"></div>
+                </div>
+            </div>
+
+            <!-- Responsive Button Actions -->
+            <div class="modal-button-group" id="modal-action-buttons">
+                <!-- Dynamically populated based on State A, B, or C -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentPostId = null;
+        let currentComment = "";
+
+        function quickFillComment(postId, text) {
+            const input = document.getElementById(`comment-input-${postId}`);
+            if (input) {
+                input.value = text;
+                input.focus();
+            }
+        }
+
+        // Toggle Like / Unlike
+        async function handleToggleLike(postId) {
+            try {
+                const response = await fetch("/api/like", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ post_id: postId })
+                });
+                const data = await response.json();
+                if (data.success) {
+                    const icon = document.getElementById(`like-icon-${postId}`);
+                    const count = document.getElementById(`like-count-${postId}`);
+                    if (icon) icon.innerText = data.liked ? "♥" : "♡";
+                    if (count) count.innerText = `${data.likes} likes`;
+                }
+            } catch (err) {
+                console.error("Failed to toggle like:", err);
+            }
+        }
+
+        // Start Moderation Check
+        async function handleStartModeration(e, postId) {
+            e.preventDefault();
+            const input = document.getElementById(`comment-input-${postId}`);
+            const text = input ? input.value.trim() : "";
+
+            if (!text) return;
+
+            currentPostId = postId;
+            currentComment = text;
+
+            try {
+                const response = await fetch("/api/moderate-comment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ comment: text })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    renderModerationModal(data.state, data.heading, data.message, text, data.language, data.confidence);
+                } else {
+                    alert(data.error || "Moderation check failed.");
+                }
+            } catch (err) {
+                console.error("Error during comment moderation:", err);
+                alert("Network error while verifying comment.");
+            }
+        }
+
+        // Render the polished 3-State Moderation Modal
+        function renderModerationModal(state, heading, message, commentText, language, confidence) {
+            const overlay = document.getElementById("moderation-modal-overlay");
+            const dialog = document.getElementById("moderation-modal-dialog");
+            const statusPill = document.getElementById("modal-status-pill");
+            const langPill = document.getElementById("modal-language-pill");
+            const titleElem = document.getElementById("modal-title-text");
+            const descElem = document.getElementById("modal-desc-text");
+            const quoteElem = document.getElementById("modal-quote-content");
+            const confText = document.getElementById("modal-confidence-text");
+            const confBar = document.getElementById("modal-confidence-bar");
+            const actionsElem = document.getElementById("modal-action-buttons");
+
+            titleElem.innerText = heading;
+            descElem.innerText = message;
+            quoteElem.innerText = `"${commentText}"`;
+            langPill.innerText = `LANG: ${language || 'ENGLISH'}`;
+            
+            const confVal = confidence || 95;
+            confText.innerText = `${confVal}%`;
+            confBar.style.width = `${confVal}%`;
+
+            // Reset class states
+            dialog.className = "modal-dialog state-" + state;
+
+            if (state === "safe") {
+                // STATE A — COMMENT APPEARS SAFE
+                statusPill.innerText = "STATUS: SAFE TO POST";
+                statusPill.className = "modal-status-badge status-safe";
+
+                actionsElem.innerHTML = `
+                    <button type="button" class="btn modal-btn primary-action" onclick="confirmPublishComment()">POST COMMENT</button>
+                    <button type="button" class="btn modal-btn secondary-action" onclick="handleEditComment()">EDIT COMMENT</button>
+                `;
+            } else if (state === "review") {
+                // STATE B — POSSIBLY HARMFUL COMMENT
+                statusPill.innerText = "STATUS: REVIEW SUGGESTED";
+                statusPill.className = "modal-status-badge status-review";
+
+                actionsElem.innerHTML = `
+                    <button type="button" class="btn modal-btn primary-action" onclick="handleEditComment()">EDIT COMMENT</button>
+                    <button type="button" class="btn modal-btn secondary-action" onclick="handleCancelComment()">CANCEL</button>
+                `;
+            } else {
+                // STATE C — CLEARLY ABUSIVE OR HARASSING COMMENT
+                statusPill.innerText = "STATUS: CONTENT BLOCKED";
+                statusPill.className = "modal-status-badge status-blocked";
+
+                actionsElem.innerHTML = `
+                    <button type="button" class="btn modal-btn primary-action" onclick="handleEditComment()">EDIT COMMENT</button>
+                    <button type="button" class="btn modal-btn secondary-action" onclick="handleCancelComment()">DISCARD COMMENT</button>
+                `;
+            }
+
+            overlay.style.display = "flex";
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById("moderation-modal-overlay");
+            if (overlay) overlay.style.display = "none";
+        }
+
+        // Action: Edit Comment
+        function handleEditComment() {
+            closeModal();
+            if (currentPostId) {
+                const input = document.getElementById(`comment-input-${currentPostId}`);
+                if (input) {
+                    input.value = currentComment;
+                    input.focus();
+                }
+            }
+        }
+
+        // Action: Cancel
+        function handleCancelComment() {
+            closeModal();
+            if (currentPostId) {
+                const input = document.getElementById(`comment-input-${currentPostId}`);
+                if (input) input.value = "";
+            }
+            currentPostId = null;
+            currentComment = "";
+        }
+
+        // Action: Confirm & Post approved comment
+        async function confirmPublishComment() {
+            if (!currentPostId || !currentComment) return;
+
+            try {
+                const response = await fetch("/api/post-comment", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        post_id: currentPostId,
+                        comment: currentComment
+                    })
+                });
+
+                const data = await response.json();
+                if (data.success) {
+                    // Append new comment to UI immediately
+                    const list = document.getElementById(`comments-list-${currentPostId}`);
+                    const badge = document.getElementById(`comment-count-badge-${currentPostId}`);
+                    
+                    if (list) {
+                        const noMsg = list.querySelector(".no-comments-msg");
+                        if (noMsg) noMsg.remove();
+
+                        const newRow = document.createElement("div");
+                        newRow.className = "comment-row";
+                        newRow.innerHTML = `
+                            <span class="comment-author">@${data.comment.username}</span>
+                            <span class="comment-body">${data.comment.text}</span>
+                        `;
+                        list.appendChild(newRow);
+                    }
+
+                    if (badge) {
+                        badge.innerText = data.total_comments;
+                    }
+
+                    // Reset input
+                    const input = document.getElementById(`comment-input-${currentPostId}`);
+                    if (input) input.value = "";
+
+                    closeModal();
+                    currentPostId = null;
+                    currentComment = "";
+                } else {
+                    alert(data.error || "Failed to post comment.");
+                }
+            } catch (err) {
+                console.error("Failed to post comment:", err);
+                alert("Network error while posting comment.");
+            }
+        }
+    </script>
+</body>
+</html>
